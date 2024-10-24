@@ -1,3 +1,4 @@
+<img src="https://github.com/user-attachments/assets/f246be23-ed44-4e88-a0a8-e4dd8f9afab2" alt="image" width="300"/>
 
 # OpenSearch Data Export Tool
 
