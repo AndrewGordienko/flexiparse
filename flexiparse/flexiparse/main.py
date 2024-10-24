@@ -172,6 +172,10 @@ def process_data(request_file, response_file, output_csv):
     if 'doc_count' in df.columns:
         df = df.drop(columns=['doc_count'])
 
+    # Hardcoded check to rename '0' to 'callingParty' for voice output - this is an annoying bug that may need to be revisited in the future.
+    if '0' in df.columns:
+        df = df.rename(columns={'0': 'callingParty'})
+
     # Reorder the DataFrame columns based on your requirements
     available_columns = list(df.columns)
 
