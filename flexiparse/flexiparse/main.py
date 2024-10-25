@@ -75,6 +75,11 @@ def parse_buckets(buckets, parent_data=None, current_aggs_key=None, aggs_info=No
                 row['date'] = pd.to_datetime(date_str).strftime('%Y-%m-%d')
             elif agg_type == 'terms':
                 row[field_name] = bucket.get('key')
+
+                # Change __missing__ to Missing
+                if row[field_name] == "__missing__":
+                    row[field_name] = "Missing"
+
             elif agg_type in ['sum', 'count', 'avg', 'max', 'min', 'value_count']:
                 metric_value = bucket.get(agg_info['agg_type'])
                 if isinstance(metric_value, dict) and 'value' in metric_value:
@@ -172,9 +177,17 @@ def process_data(request_file, response_file, output_csv):
     if 'doc_count' in df.columns:
         df = df.drop(columns=['doc_count'])
 
-    # Hardcoded check to rename '0' to 'callingParty' for voice output - this is an annoying bug that may need to be revisited in the future.
+    # Hardcoded check to rename '0' to 'callingParty' for voice output
     if '0' in df.columns:
         df = df.rename(columns={'0': 'callingParty'})
+
+    # Rename 'visitedMCCMNC' to 'plmn'
+    if 'visitedMCCMNC' in df.columns:
+        df = df.rename(columns={'visitedMCCMNC': 'plmn'})
+
+    # Rename 'plmnId' to 'plmn'
+    if 'plmnId' in df.columns:
+        df = df.rename(columns={'plmnId': 'plmn'})
 
     # Reorder the DataFrame columns based on your requirements
     available_columns = list(df.columns)
@@ -209,9 +222,10 @@ def process_data(request_file, response_file, output_csv):
     # Export to CSV
     df.to_csv(output_csv, index=False)
 
+    # Print DataFrame to verify results
+
     return df
 
-# Optional: Separate function to display the DataFrame
 def display_dataframe(df):
     pd.set_option('display.max_columns', None)
     pd.set_option('display.width', None)
